@@ -177,6 +177,8 @@ class TextOverlay {
 
     // 既存のアニメーションを停止
     this.stopAnimation(index);
+    // 前のスタイルをリセット（残留シャドウや変形を防ぐ）
+    this.resetAnimationStyles(index);
 
     const textEl = this.textElements[index];
     textEl.dataset.animation = type;
@@ -422,6 +424,23 @@ class TextOverlay {
 
     this.isAnimating[index] = true;
     animate();
+  }
+
+  /**
+   * アニメーションで付与したインラインスタイルをリセット
+   */
+  resetAnimationStyles(index) {
+    const textEl = this.textElements[index];
+    if (!textEl) return;
+
+    textEl.style.transform = '';
+    textEl.style.opacity = '';
+    textEl.style.textShadow = '';
+    textEl.style.left = '';
+    textEl.style.top = '';
+    textEl.style.filter = '';
+    textEl.style.perspective = '';
+    textEl.style.transformStyle = '';
   }
 
   /**
