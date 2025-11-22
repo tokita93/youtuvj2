@@ -54,6 +54,20 @@ class TextOverlay {
   }
 
   /**
+   * 派手な浮遊を計算（より大きな動き）
+   */
+  calculateDynamicFloating(time, offsetX, offsetY, amplitude = 80) {
+    // 複数の波を重ねて複雑でダイナミックな動きに
+    const x = Math.sin(time + offsetX) * amplitude +
+              Math.sin(time * 2.3 + offsetY) * (amplitude * 0.4) +
+              Math.cos(time * 0.5) * (amplitude * 0.3);
+    const y = Math.cos(time * 0.7 + offsetY) * amplitude +
+              Math.cos(time * 1.8 + offsetX) * (amplitude * 0.4) +
+              Math.sin(time * 0.3) * (amplitude * 0.3);
+    return { x, y };
+  }
+
+  /**
    * テキストを追加/更新
    */
   addText(index, content, animation, params = {}) {
@@ -233,7 +247,7 @@ class TextOverlay {
   }
 
   /**
-   * 横スクロールアニメーション（ランダムな浮遊追加）
+   * 横スクロールアニメーション（派手な動き）
    */
   startScrollAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -243,18 +257,19 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += 0.02 * speed;
-      position -= speed * 2;
+      time += 0.03 * speed;
+      position -= speed * 3;
 
       if (position < -textEl.offsetWidth) {
         position = window.innerWidth;
       }
 
-      // ランダムな浮遊を追加
-      const floating = this.calculateFloating(time, offsets.x, offsets.y, 10);
-      const rotation = Math.sin(time + offsets.rotation) * 2;
+      // 派手な浮遊を追加
+      const floating = this.calculateDynamicFloating(time, offsets.x, offsets.y, 60);
+      const rotation = Math.sin(time + offsets.rotation) * 15;
+      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.3;
 
-      textEl.style.transform = `translate(${position}px, ${floating.y}px) rotate(${rotation}deg)`;
+      textEl.style.transform = `translate(${position}px, ${floating.y}px) rotate(${rotation}deg) scale(${scale})`;
 
       if (this.isAnimating[index]) {
         this.animationFrames[index] = requestAnimationFrame(animate);
@@ -266,7 +281,7 @@ class TextOverlay {
   }
 
   /**
-   * 縦移動アニメーション（ランダムな浮遊追加）
+   * 縦移動アニメーション（派手な動き）
    */
   startVerticalAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -276,17 +291,17 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += 0.02 * speed;
-      position -= speed * 1.5;
+      time += 0.03 * speed;
+      position -= speed * 2.5;
 
       if (position < -textEl.offsetHeight) {
         position = window.innerHeight;
       }
 
-      // ランダムな浮遊を追加
-      const floating = this.calculateFloating(time, offsets.x, offsets.y, 15);
-      const rotation = Math.sin(time * 0.5 + offsets.rotation) * 3;
-      const scale = 1 + Math.sin(time + offsets.scale) * 0.05;
+      // 派手な浮遊を追加
+      const floating = this.calculateDynamicFloating(time, offsets.x, offsets.y, 80);
+      const rotation = Math.sin(time * 0.5 + offsets.rotation) * 20;
+      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.4;
 
       textEl.style.transform = `translate(${floating.x}px, ${position}px) rotate(${rotation}deg) scale(${scale})`;
 
@@ -300,7 +315,7 @@ class TextOverlay {
   }
 
   /**
-   * 回転アニメーション（浮遊追加）
+   * 回転アニメーション（派手な動き）
    */
   startRotateAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -310,12 +325,12 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += 0.02 * speed;
-      rotation += speed * 0.5;
+      time += 0.04 * speed;
+      rotation += speed * 2;
 
-      // 浮遊する動き
-      const floating = this.calculateFloating(time, offsets.x, offsets.y, 20);
-      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.08;
+      // 派手な浮遊する動き
+      const floating = this.calculateDynamicFloating(time, offsets.x, offsets.y, 100);
+      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.5;
 
       textEl.style.transform = `translate(${floating.x}px, ${floating.y}px) rotate(${rotation}deg) scale(${scale})`;
 
@@ -329,7 +344,7 @@ class TextOverlay {
   }
 
   /**
-   * 点滅アニメーション（浮遊追加、スムーズなフェード）
+   * 点滅アニメーション（派手な動き）
    */
   startBlinkAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -338,16 +353,17 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += speed * 0.05;
+      time += speed * 0.06;
 
-      // 浮遊
-      const floating = this.calculateFloating(time, offsets.x, offsets.y, 10);
-      const rotation = Math.sin(time * 0.5 + offsets.rotation) * 2;
+      // 派手な浮遊
+      const floating = this.calculateDynamicFloating(time, offsets.x, offsets.y, 70);
+      const rotation = Math.sin(time * 0.5 + offsets.rotation) * 25;
+      const scale = 1 + Math.sin(time * 1.5 + offsets.scale) * 0.4;
 
       // スムーズな点滅（sin波を使用）
       const opacity = (Math.sin(time * 3) + 1) / 2; // 0-1の範囲
 
-      textEl.style.transform = `translate(${floating.x}px, ${floating.y}px) rotate(${rotation}deg)`;
+      textEl.style.transform = `translate(${floating.x}px, ${floating.y}px) rotate(${rotation}deg) scale(${scale})`;
       textEl.style.opacity = opacity.toString();
 
       if (this.isAnimating[index]) {
@@ -360,7 +376,7 @@ class TextOverlay {
   }
 
   /**
-   * ネオンエフェクトアニメーション（浮遊追加）
+   * ネオンエフェクトアニメーション（派手な動き）
    */
   startNeonAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -370,21 +386,23 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += speed * 0.03;
+      time += speed * 0.05;
 
-      // 浮遊
-      const floating = this.calculateFloating(time, offsets.x, offsets.y, 15);
-      const rotation = Math.sin(time * 0.5 + offsets.rotation) * 3;
+      // 派手な浮遊
+      const floating = this.calculateDynamicFloating(time, offsets.x, offsets.y, 90);
+      const rotation = Math.sin(time * 0.7 + offsets.rotation) * 30;
+      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.35;
 
-      // スムーズなネオンパルス
-      const intensity = (Math.sin(time + offsets.scale) + 1) / 2; // 0-1の範囲
-      const blur = intensity * 20 + 10;
+      // 強烈なネオンパルス
+      const intensity = (Math.sin(time * 1.5 + offsets.scale) + 1) / 2; // 0-1の範囲
+      const blur = intensity * 40 + 20;
 
-      textEl.style.transform = `translate(${floating.x}px, ${floating.y}px) rotate(${rotation}deg)`;
+      textEl.style.transform = `translate(${floating.x}px, ${floating.y}px) rotate(${rotation}deg) scale(${scale})`;
       textEl.style.textShadow = `
         0 0 ${blur}px ${color},
         0 0 ${blur * 2}px ${color},
-        0 0 ${blur * 3}px ${color}
+        0 0 ${blur * 3}px ${color},
+        0 0 ${blur * 4}px ${color}
       `;
       textEl.style.opacity = 0.8 + intensity * 0.2;
 
@@ -398,7 +416,7 @@ class TextOverlay {
   }
 
   /**
-   * 波アニメーション（より洗練された動き）
+   * 波アニメーション（派手な動き）
    */
   startWaveAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -407,13 +425,13 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += speed * 0.05;
+      time += speed * 0.07;
 
-      // 複数の波を重ねて自然な動きに
-      const y = Math.sin(time + offsets.y) * 30 + Math.sin(time * 1.5 + offsets.x) * 10;
-      const x = Math.cos(time * 0.8 + offsets.x) * 15;
-      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.1;
-      const rotation = Math.sin(time * 0.7 + offsets.rotation) * 5;
+      // 複数の大きな波を重ねてダイナミックに
+      const y = Math.sin(time + offsets.y) * 80 + Math.sin(time * 1.5 + offsets.x) * 40 + Math.cos(time * 2.5) * 20;
+      const x = Math.cos(time * 0.8 + offsets.x) * 60 + Math.sin(time * 1.2) * 30;
+      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.6;
+      const rotation = Math.sin(time * 0.7 + offsets.rotation) * 35;
 
       textEl.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${rotation}deg)`;
 
@@ -492,40 +510,40 @@ class TextOverlay {
   }
 
   /**
-   * ランダム移動アニメーション（スムーズなイージング追加）
+   * ランダム移動アニメーション（派手な動き）
    */
   startRandomMoveAnimation(index, params) {
     const textEl = this.textElements[index];
     const speed = params.speed || 1;
-    let targetX = Math.random() * (window.innerWidth * 0.8);
-    let targetY = Math.random() * (window.innerHeight * 0.8);
+    let targetX = Math.random() * (window.innerWidth * 0.9);
+    let targetY = Math.random() * (window.innerHeight * 0.9);
     let currentX = window.innerWidth / 2;
     let currentY = window.innerHeight / 2;
     let time = 0;
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += 0.02 * speed;
+      time += 0.04 * speed;
 
       // 目標位置に近づく（イージング適用）
       const dx = targetX - currentX;
       const dy = targetY - currentY;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < 20) {
-        // 新しい目標位置を設定（画面端を避ける）
-        targetX = 100 + Math.random() * (window.innerWidth - 200);
-        targetY = 100 + Math.random() * (window.innerHeight - 200);
+      if (distance < 50) {
+        // 新しい目標位置を設定（より広範囲に）
+        targetX = 50 + Math.random() * (window.innerWidth - 100);
+        targetY = 50 + Math.random() * (window.innerHeight - 100);
       }
 
-      // スムーズなイージング
-      currentX += dx * 0.03 * speed;
-      currentY += dy * 0.03 * speed;
+      // より速いイージング
+      currentX += dx * 0.05 * speed;
+      currentY += dy * 0.05 * speed;
 
-      // 微細な浮遊を追加
-      const microFloat = this.calculateFloating(time, offsets.x, offsets.y, 5);
-      const rotation = Math.sin(time + offsets.rotation) * 5;
-      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.05;
+      // 派手な浮遊を追加
+      const microFloat = this.calculateDynamicFloating(time, offsets.x, offsets.y, 40);
+      const rotation = Math.sin(time * 1.5 + offsets.rotation) * 45;
+      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.5;
 
       textEl.style.left = `${currentX + microFloat.x}px`;
       textEl.style.top = `${currentY + microFloat.y}px`;
@@ -541,7 +559,7 @@ class TextOverlay {
   }
 
   /**
-   * ズームパルスアニメーション（浮遊追加）
+   * ズームパルスアニメーション（派手な動き）
    */
   startZoomAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -550,17 +568,17 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += speed * 0.05;
+      time += speed * 0.08;
 
-      // 浮遊
-      const floating = this.calculateFloating(time, offsets.x, offsets.y, 15);
+      // 派手な浮遊
+      const floating = this.calculateDynamicFloating(time, offsets.x, offsets.y, 100);
 
-      // ズームとパルス
-      const scale = 1 + Math.sin(time + offsets.scale) * 0.3;
-      const rotation = Math.sin(time * 0.5 + offsets.rotation) * 10;
+      // 大きなズームとパルス
+      const scale = 1 + Math.sin(time + offsets.scale) * 0.9;
+      const rotation = Math.sin(time * 0.8 + offsets.rotation) * 40;
 
       textEl.style.transform = `translate(${floating.x}px, ${floating.y}px) scale(${scale}) rotate(${rotation}deg)`;
-      textEl.style.opacity = 0.7 + Math.sin(time) * 0.3;
+      textEl.style.opacity = 0.6 + Math.sin(time * 1.2) * 0.4;
 
       if (this.isAnimating[index]) {
         this.animationFrames[index] = requestAnimationFrame(animate);
@@ -572,7 +590,7 @@ class TextOverlay {
   }
 
   /**
-   * 虹色アニメーション（浮遊追加）
+   * 虹色アニメーション（派手な動き）
    */
   startRainbowAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -582,20 +600,21 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += speed * 0.03;
-      hue = (hue + speed * 2) % 360;
+      time += speed * 0.06;
+      hue = (hue + speed * 4) % 360;
 
-      // 浮遊
-      const floating = this.calculateFloating(time, offsets.x, offsets.y, 20);
-      const rotation = Math.sin(time + offsets.rotation) * 5;
-      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.08;
+      // 派手な浮遊
+      const floating = this.calculateDynamicFloating(time, offsets.x, offsets.y, 110);
+      const rotation = Math.sin(time * 1.2 + offsets.rotation) * 50;
+      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.7;
 
       textEl.style.transform = `translate(${floating.x}px, ${floating.y}px) rotate(${rotation}deg) scale(${scale})`;
       textEl.style.color = `hsl(${hue}, 100%, 60%)`;
       textEl.style.textShadow = `
-        0 0 10px hsl(${hue}, 100%, 60%),
         0 0 20px hsl(${hue}, 100%, 60%),
-        0 0 30px hsl(${hue}, 100%, 60%)
+        0 0 40px hsl(${hue}, 100%, 60%),
+        0 0 60px hsl(${hue}, 100%, 60%),
+        0 0 80px hsl(${(hue + 60) % 360}, 100%, 60%)
       `;
 
       if (this.isAnimating[index]) {
@@ -608,7 +627,7 @@ class TextOverlay {
   }
 
   /**
-   * カオスアニメーション（洗練された複雑な動き）
+   * カオスアニメーション（超派手な複雑な動き）
    */
   startChaosAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -618,23 +637,25 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      time += speed * 0.05;
-      hue = (hue + speed * 3) % 360;
+      time += speed * 0.08;
+      hue = (hue + speed * 6) % 360;
 
-      // 複数のsin/cos波を組み合わせた有機的な動き
-      const x = Math.sin(time + offsets.x) * 150 +
-                Math.sin(time * 2.3 + offsets.y) * 50 +
-                Math.cos(time * 0.7) * 30;
-      const y = Math.cos(time * 0.7 + offsets.y) * 120 +
-                Math.sin(time * 1.7 + offsets.x) * 40 +
-                Math.cos(time * 3) * 20;
-      const rotation = Math.sin(time * 0.5 + offsets.rotation) * 180 +
-                       Math.cos(time * 1.2) * 90;
-      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.4 +
-                    Math.cos(time * 3.5) * 0.2;
+      // 超複雑なsin/cos波を組み合わせた動き
+      const x = Math.sin(time + offsets.x) * 200 +
+                Math.sin(time * 2.3 + offsets.y) * 80 +
+                Math.cos(time * 0.7) * 50 +
+                Math.sin(time * 4.1) * 30;
+      const y = Math.cos(time * 0.7 + offsets.y) * 180 +
+                Math.sin(time * 1.7 + offsets.x) * 70 +
+                Math.cos(time * 3) * 40 +
+                Math.sin(time * 5.2) * 25;
+      const rotation = Math.sin(time * 0.8 + offsets.rotation) * 360 +
+                       Math.cos(time * 1.5) * 180;
+      const scale = 1 + Math.sin(time * 2 + offsets.scale) * 0.8 +
+                    Math.cos(time * 3.5) * 0.4;
 
-      // 控えめなグリッチエフェクト（頻度を下げる）
-      const glitch = Math.random() < 0.05 ? (Math.random() - 0.5) * 15 : 0;
+      // グリッチエフェクト
+      const glitch = Math.random() < 0.08 ? (Math.random() - 0.5) * 25 : 0;
 
       textEl.style.transform = `
         translate(${x + glitch}px, ${y + glitch}px)
@@ -642,15 +663,16 @@ class TextOverlay {
         scale(${scale})
       `;
 
-      textEl.style.color = `hsl(${hue}, 100%, ${55 + Math.sin(time * 5) * 15}%)`;
+      textEl.style.color = `hsl(${hue}, 100%, ${50 + Math.sin(time * 5) * 20}%)`;
 
-      // より美しいシャドウ
-      const shadowIntensity = 10 + Math.sin(time * 3) * 15;
+      // 超派手なシャドウ
+      const shadowIntensity = 20 + Math.sin(time * 3) * 30;
       textEl.style.textShadow = `
         0 0 ${shadowIntensity}px hsl(${hue}, 100%, 60%),
         0 0 ${shadowIntensity * 2}px hsl(${(hue + 60) % 360}, 100%, 60%),
-        ${Math.sin(time * 4) * 5}px 0 0 rgba(255, 0, 0, 0.3),
-        ${-Math.cos(time * 4) * 5}px 0 0 rgba(0, 255, 255, 0.3)
+        0 0 ${shadowIntensity * 3}px hsl(${(hue + 120) % 360}, 100%, 60%),
+        ${Math.sin(time * 4) * 10}px 0 0 rgba(255, 0, 0, 0.5),
+        ${-Math.cos(time * 4) * 10}px 0 0 rgba(0, 255, 255, 0.5)
       `;
 
       if (this.isAnimating[index]) {
@@ -663,7 +685,7 @@ class TextOverlay {
   }
 
   /**
-   * 3D回転アニメーション（浮遊追加）
+   * 3D回転アニメーション（派手な動き）
    */
   start3DRotateAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -675,15 +697,15 @@ class TextOverlay {
     textEl.style.transformStyle = 'preserve-3d';
 
     const animate = () => {
-      time += speed * 0.02;
+      time += speed * 0.06;
 
-      // 浮遊
-      const floating = this.calculateFloating(time, offsets.x, offsets.y, 25);
+      // 派手な浮遊
+      const floating = this.calculateDynamicFloating(time, offsets.x, offsets.y, 120);
 
-      const rotateX = Math.sin(time + offsets.x) * 60;
-      const rotateY = Math.cos(time * 0.7 + offsets.y) * 60;
-      const rotateZ = time * 20 + Math.sin(time * 2) * 30;
-      const scale = 1 + Math.sin(time * 3 + offsets.scale) * 0.1;
+      const rotateX = Math.sin(time + offsets.x) * 180 + Math.cos(time * 2) * 60;
+      const rotateY = Math.cos(time * 0.7 + offsets.y) * 180 + Math.sin(time * 1.5) * 60;
+      const rotateZ = time * 50 + Math.sin(time * 2) * 90;
+      const scale = 1 + Math.sin(time * 3 + offsets.scale) * 0.6;
 
       textEl.style.transform = `
         translate(${floating.x}px, ${floating.y}px)
@@ -704,7 +726,7 @@ class TextOverlay {
   }
 
   /**
-   * スパイラルアニメーション（スムーズなパルス追加）
+   * スパイラルアニメーション（派手な動き）
    */
   startSpiralAnimation(index, params) {
     const textEl = this.textElements[index];
@@ -714,20 +736,20 @@ class TextOverlay {
     const offsets = this.randomOffsets[index];
 
     const animate = () => {
-      angle += speed * 0.05;
-      time += speed * 0.02;
+      angle += speed * 0.1;
+      time += speed * 0.05;
 
-      // 動的に変化する半径
-      const radiusBase = (Math.sin(angle * 0.3 + offsets.x) + 1) * 150;
-      const radiusPulse = Math.sin(time * 2 + offsets.y) * 30;
+      // 大きく変化する半径
+      const radiusBase = (Math.sin(angle * 0.3 + offsets.x) + 1) * 250;
+      const radiusPulse = Math.sin(time * 2 + offsets.y) * 80 + Math.cos(time * 3) * 40;
       const radius = radiusBase + radiusPulse;
 
       const x = window.innerWidth / 2 + Math.cos(angle + offsets.x) * radius;
       const y = window.innerHeight / 2 + Math.sin(angle + offsets.y) * radius;
 
-      // より滑らかな回転
-      const rotation = angle * 57.3 + Math.sin(time + offsets.rotation) * 20;
-      const scale = 1 + Math.sin(time * 3 + offsets.scale) * 0.1;
+      // 激しい回転とスケール
+      const rotation = angle * 57.3 + Math.sin(time * 1.5 + offsets.rotation) * 90;
+      const scale = 1 + Math.sin(time * 3 + offsets.scale) * 0.7;
 
       textEl.style.left = `${x}px`;
       textEl.style.top = `${y}px`;
